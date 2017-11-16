@@ -51,7 +51,7 @@ Let me first create my user:
 create user yzhu password 'Mysuperaw3somepAssword';
 ```
 
-Then I can just assign it to my group:
+Then I can assign it to the `readonly` group:
 
 ```sql
 alter group readonly add user yzhu;
@@ -248,7 +248,7 @@ grant select on all tables in schema report_test to group readwrite;
 alter default privileges grant select on tables to group readwrite;
 ```
 
-The above will allow the group `readwrite` to read everything, just like how we did the privileges for the group `readonly`.
+The above set of queries will allow the group `readwrite` to read everything, just like how we did the privileges for the group `readonly`.
 
 Remember how we previously remove my user from the `readonly` group in the Extra Extra Credit section? Now we sanity-check again by adding my user to the `readwrite` group:
 
@@ -256,7 +256,7 @@ Remember how we previously remove my user from the `readonly` group in the Extra
 alter group readwrite add user yzhu;
 ```
 
-If we can run the giant query again right now, we should get the same results as if our group were readonly. Makes sense, since we haven't assigned any write privileges yet.
+If we can run the giant permissions query right now, we should get the same results as if our group were readonly. Makes sense, since we haven't assigned any write privileges yet.
 
 ### Allow Write on Certain Schemas
 
@@ -270,7 +270,7 @@ grant all privileges on schema report_test to group readwrite;
 grant all privileges on all tables in schema report_test to group readwrite;
 ```
 
-Note the tiered level permissions. Privileges on the tables are self-explanatory; privileges on the schema allows creating the tables in the first place, among other things.
+Note the tiered level permissions. Privileges on the table-level are self-explanatory; privileges on the schema-level allows creating the tables in the first place, among other things.
 
 We're not done yet. Let's set the default permissions, so we don't have to repeat the table privileges for every new table.
 
@@ -278,14 +278,3 @@ We're not done yet. Let's set the default permissions, so we don't have to repea
 alter default privileges in schema report_yzhu grant all privileges on tables to group readwrite;
 alter default privileges in schema report_test grant all privileges on tables to group readwrite;
 ```
-
-### Private Info
-
-While we prefer to be open, maybe there are some stuff that you just don't want your peers (other than Redshift admins) to see, until it's fully ready. Because Redshift permissions are very much schema-based, we can create a private schema only available to the user.
-
-```sql
-create schema private_yzhu;
-alter schema private_yzhu owner to yzhu;
-```
-
-Easy, right? With `yzhu` set as the owner of the schema, my user will be able to do anything I want within the schema. But no one else can look into it, because no other permissions were granted.
