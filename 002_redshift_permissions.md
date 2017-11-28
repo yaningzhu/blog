@@ -170,7 +170,23 @@ The easiest way to make this work:
 alter default privileges grant select on tables to group readonly;
 ```
 
-This automatically grants select on all future tables to the group `readonly`. Notice when we were trying to grant select on tables previously, we had to do it schema by schema. This statement covers all future tables in all schemas. Neat, eh?
+This automatically grants select on all future tables to the group `readonly` for the user running this statement. If I run this statement on my admin user, then any table the admin user creates will be readable by the group readonly.
+
+But not everyone will be creating table on the admin user, so we should do this schema by schema to make sure the readonly group can truly read everything:
+
+```
+alter default privileges in schema report_yzhu grant select on tables to group readonly;
+alter default privileges in schema android grant select on tables to group readonly;
+alter default privileges in schema ios grant select on tables to group readonly;
+```
+
+Now if you want to do this for a specific user, you can do that too:
+
+```
+alter default privileges for user app_user grant select on tables to group readonly;
+```
+
+The statement above will make sure any new tables that the `app_user` creates will be available to the `readonly` group.
 
 ### Extra Credit
 
@@ -179,9 +195,10 @@ So now let's see what we have to do when we create a new schema.
 ```sql
 create schema report_test;
 grant usage on schema report_test to group readonly;
+alter default privileges in schema report_test grant select on tables to group readonly;
 ```
 
-And that should be it! Nothing else needs to be done thanks to the all-covering default privilege in the previous section.
+And that should be it! Nothing else needs to be done.
 
 We can check this by creating a table first:
 
@@ -234,16 +251,19 @@ create group readwrite;
 
 grant usage on schema android to group readwrite;
 grant select on all tables in schema android to group readwrite;
+alter default privileges in schema android grant select on tables to group readwrite;
 
 grant usage on schema ios to group readwrite;
 grant select on all tables in schema ios to group readwrite;
+alter default privileges in schema ios grant select on tables to group readwrite;
 
 grant usage on schema report_yzhu to group readwrite;
 grant select on all tables in schema report_yzhu to group readwrite;
+alter default privileges in schema report_yzhu grant select on tables to group readwrite;
 
 grant usage on schema report_test to group readwrite;
 grant select on all tables in schema report_test to group readwrite;
-
+alter default privileges in schema report_test grant select on tables to group readwrite;
 
 alter default privileges grant select on tables to group readwrite;
 ```
