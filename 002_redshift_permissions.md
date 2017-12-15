@@ -172,17 +172,15 @@ alter default privileges grant select on tables to group readonly;
 
 This automatically grants select on all future tables to the group `readonly` for the user running this statement. If I run this statement on my admin user, then any table the admin user creates will be readable by the group readonly.
 
-But not everyone will be creating table on the admin user, so we should do this schema by schema to make sure the readonly group can truly read everything:
+### Consideration
+
+But not everyone will be creating table on the admin user. Redshift has a very strong philosophy of user ownership. Basically, you create the table, you own it. It can be up the table-creator themselves to grant permissions to everyone.
+
+Not everyone is familiar enough with permissions to do this though. So as the database admin, everytime you create an user, you can run the default privilege for that user:
 
 ```
-alter default privileges in schema report_yzhu grant select on tables to group readonly;
-alter default privileges in schema android grant select on tables to group readonly;
-alter default privileges in schema ios grant select on tables to group readonly;
-```
+create user "app_user";
 
-Now if you want to do this for a specific user, you can do that too:
-
-```
 alter default privileges for user app_user grant select on tables to group readonly;
 ```
 
@@ -195,7 +193,6 @@ So now let's see what we have to do when we create a new schema.
 ```sql
 create schema report_test;
 grant usage on schema report_test to group readonly;
-alter default privileges in schema report_test grant select on tables to group readonly;
 ```
 
 And that should be it! Nothing else needs to be done.
@@ -251,19 +248,15 @@ create group readwrite;
 
 grant usage on schema android to group readwrite;
 grant select on all tables in schema android to group readwrite;
-alter default privileges in schema android grant select on tables to group readwrite;
 
 grant usage on schema ios to group readwrite;
 grant select on all tables in schema ios to group readwrite;
-alter default privileges in schema ios grant select on tables to group readwrite;
 
 grant usage on schema report_yzhu to group readwrite;
 grant select on all tables in schema report_yzhu to group readwrite;
-alter default privileges in schema report_yzhu grant select on tables to group readwrite;
 
 grant usage on schema report_test to group readwrite;
 grant select on all tables in schema report_test to group readwrite;
-alter default privileges in schema report_test grant select on tables to group readwrite;
 
 alter default privileges grant select on tables to group readwrite;
 ```
@@ -291,10 +284,3 @@ grant all privileges on all tables in schema report_test to group readwrite;
 ```
 
 Note the tiered level permissions. Privileges on the table-level are self-explanatory; privileges on the schema-level allows creating the tables in the first place, among other things.
-
-We're not done yet. Let's set the default permissions, so we don't have to repeat the table privileges for every new table.
-
-```sql
-alter default privileges in schema report_yzhu grant all privileges on tables to group readwrite;
-alter default privileges in schema report_test grant all privileges on tables to group readwrite;
-```
