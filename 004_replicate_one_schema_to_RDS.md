@@ -94,9 +94,24 @@ Restart MySQL service for new setting to take effect. Now the intermediary serve
 
 ### Set up Replication
 
-Now the intermediary server is ready, we can set RDS/Aurora to replicate off of it.
+Now the intermediary server is ready, we can set RDS/Aurora to replicate off of it. Run `SHOW MASTER STATUS` on the intermediary server to get the binlog position.
 
-Log on to your RDS/Aurora instance. At the time of this writing, you have to use [`mysql.rds_set_external_master`](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/mysql_rds_set_external_master.html) to do that. Then start replication with [`mysql.rds_start_replication()`](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/mysql_rds_start_replication.html). Consult AWS documentation for details.
+Log on to your RDS/Aurora instance. At the time of this writing, you have to use [`mysql.rds_set_external_master`](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/mysql_rds_set_external_master.html) to do that. Example below, but check AWS official doc for the latest syntax:
+
+```
+call mysql.rds_set_external_master(
+    '<intermediary server host>',
+    <intermediary server port>,
+    '<replication user login>',
+    '<replication user password>',
+    '<binlog name>',
+    <binlog position>,
+    <0 or 1 for SSL>
+);
+```
+
+
+Then start replication with [`call mysql.rds_start_replication()`](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/mysql_rds_start_replication.html). Consult AWS documentation for details.
 
 Now you have completed the B->C part of the A->B->C chain.
 
