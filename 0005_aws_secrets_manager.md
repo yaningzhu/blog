@@ -77,13 +77,13 @@ When you created the secret in the last step, AWS automatically created the IAM 
 
 2. Click on the "role" link on the message. It will open a new tab that takes you directly to the IAM role. Here we need to make some edits.
 
-3. ![](/screenshots/0005/07.png)
+3. Here we see two inline policies that ends in -0 and -1. Expand the -1, and click "Edit Policy"
 
-    Here we see two inline policies that ends in -0 and -1. Expand the -1, and click "Edit Policy"
+    ![](/screenshots/0005/07.png)
 
-4. ![](/screenshots/0005/08.png)
+4. In this next screen, we click "Add additional permissions" on the right side.
 
-    In this next screen, we click "Add additional permissions" on the right side.
+    ![](/screenshots/0005/08.png)
 
 5. Now you should have a new section to fill in. Fill it in like below:
 
@@ -101,4 +101,4 @@ Back to the Secrets Management page and click on the secret that is meant to be 
 
 You can grab the Lambda function's ARN and look up the logs in Cloudwatch. Should tell you exactly what's going on.
 
-If you rotate it a couple times in succession, you'll see the username rotating between `<username>` and `<username>_clone`.
+If you rotate it a couple times in succession, you'll see the username rotating between `<login>` and `<login>_clone`.
