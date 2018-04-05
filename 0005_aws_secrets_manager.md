@@ -4,13 +4,13 @@
 
 **General FAQ**
 
-Q: What does it do?
+Q: What does it do?\
 A: It stores and rotates credentials
 
-Q: What sort of credentials?
+Q: What sort of credentials?\
 A: Database logins, various secrets, or even complete custom ones
 
-Q: How does it work?
+Q: How does it work?\
 A: After you configure the required information, a lambda function is automatically created that contains the scripts to rotate the credentials.
 
 Let's dig in.
@@ -33,9 +33,9 @@ The general idea is what we want to store two secrets. One is the master login f
 
     At the top you can select whether it's a RDS database or another database that you have to manually put the information for. In our example we're using a RDS database. Simply put in your master login and password, select the RDS database and click next.
 
-    If you choose a custom database here, not only you have to provide the host and port information, you'll later have to adjust the lambda function's security group to make sure the database is accessible by that function.
+    *If you choose a custom database here*, not only you have to provide the host and port information, you'll later have to adjust the lambda function's security group to make sure the database is accessible by that function.
 
-    Another thing to watch out is the encryption key. If you choose anything other than the default, you'll later have to adjust the IAM role of the lambda function to make sure the KMS key is accessible.
+    Another thing to watch out is the encryption key. **If you choose anything other than the default**, you'll later have to adjust the IAM role of the lambda function to make sure the KMS key is accessible.
 
 3. The next screen we simply have the name and description of the secret. Put in something appropriate and move on.
 
@@ -75,9 +75,9 @@ When you created the secret in the last step, AWS automatically created the IAM 
 
 1. From that message, copy the ARN of the master secret, you'll need it later.
 
-2. Click on the "role" link on the message. It will open a new tab that takes you directly to the IAM role. Here we need to make some edits.
+2. **Click on the "role" link on the message**. It will open a new tab that takes you directly to the IAM role. Here we need to make some edits.
 
-3. Here we see two inline policies that ends in -0 and -1. Expand the -1, and click "Edit Policy"
+3. Here we see two inline policies that ends in **0** and **1**. Expand the 1, and click "Edit Policy"
 
     ![](/screenshots/0005/07.png)
 
