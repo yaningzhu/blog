@@ -1,6 +1,6 @@
 # Restore Percona Backup to Amazon Aurora
 
-Many people these days have huge MySQL databases where mysqldump is no longer viable as backup/restore methodology. At our organization, we uses [Percona XtraBackup](https://www.percona.com/doc/percona-xtrabackup/LATEST/index.html).
+Many people these days have huge MySQL databases where mysqldump is no longer viable for backup/restore solution. At our organization, we uses [Percona XtraBackup](https://www.percona.com/doc/percona-xtrabackup/LATEST/index.html).
 
 The main advantage of Percona backup is that, it copies the actual data files along with transaction logs. When it's time to restore, it will use the transaction logs to perform crash recovery on the data files. This results in a (much) faster restore time than mysqldump, which is just a bunch of .sql statements that takes forever to be replayed.
 
@@ -82,7 +82,7 @@ create user yzhu@localhost;
 grant select on test_schema.table1 to yzhu@localhost;
 ```
 
-Nothing special here. I just created a table, an user, and granted SELECT to that user. We can verify that the grant is there by selecting from the system view:
+Nothing special here. I just created a table plus an user, and granted SELECT to that user. We can verify that the grant is there by selecting from the system view:
 
 ```sql
 select * from mysql.tables_priv;
@@ -175,3 +175,35 @@ The Amazon documentation linked earlier gives you pretty good guidance on this p
 * Upload the backup to S3. Note you can use a multi-part splitter for faster uploads. But note that S3 only allows each file to be split to a maximum of 10,000 parts for multi-upload. So don't make your chunk too small. For reference, the minimum chunk size for a 1TB file is 100MB.
 
 ## Restore Aurora from S3
+
+This part is easy, and all be done with the AWS Console.
+
+1. When you visit the RDS console page, you'll be greeted with the option to create an Aurora instance
+
+    ![](/screenshots/0006/01.png)
+
+    Click on "Restore Aurora DB Cluster from" to get started. Alternatively, you can visit the "Instances" tab, and there would be an option to restore from S3.
+
+2. On next screen, select the database engine.
+
+    ![](/screenshots/0006/02.png)
+
+    At this time, you can only select Aurora or plain MySQL. We are using Aurora for this example.
+
+3. Next screen has a couple things to note.
+
+    ![](/screenshots/0006/03.png)
+
+    For source engine version, just type in "5.6". Maybe by the time you are reading this, 5.7 will also be supported.
+
+    For S3 bucket, pick the bucket where your backup is located at. If your backup is the only backup in that directory, you can leave the optional path prefix blank. If not, you'll have to use the prefix to indicate which backup you want to restore from.
+
+    ![](/screenshots/0006/04.png)
+
+    And then on the bottom of the screen, you'll most likely have to create a new IAM role for this if you haven't done this before. The IAM role should be given access to the S3 bucket.
+
+4. Rest of the screens are standard fields for creating an Aurora cluster, so I won't show them here. Fill them out like you normally would for creating a new Aurora cluster.
+
+5. After everything is done. You'll get a final screen that says your cluster is being created, and it will take a few minutes. If your database is big, it will definitely take more than just a few minutes. Even at 200MB-300MB/sec (I'm not exactly sure how fast the throughput is), a multi-terabyte database will take quite a while to recover.
+
+6. Check back every few hours. It should complete. And if it does fail, hopefully by the time you are reading this article, AWS support will be able to assist you with failure. When I was playing with this, there were no logs whatsoever.
