@@ -1,3 +1,5 @@
+# Finding MySQL Metadata Lock
+
 Have you ever been hit by this dreaded error?
 
 ```
@@ -8,7 +10,7 @@ Here we were trying to perform an ALTER TABLE. The table only has 1000 rows; it 
 
 However we got contacted by our developer that the migration was stuck. It's apparently been stuck in that state for over 1600 seconds.
 
-# Quick Overview on Metadata Lock
+## Quick Overview on Metadata Lock
 
 It is exactly how it sounds. In order to change the metadata, MySQL will give the metadata lock to a process. From a Operations perspective, most of time we don't need to know under what conditions MySQL will require metadata lock. We just need to know that, okay something is holding the metadata lock and it's blocking a lot of stuff, we need to resolve it ASAP.
 
@@ -16,7 +18,7 @@ Unfortunately, metadata lock is not a "normal" lock by MySQL. So if you search f
 
 Fun, isn't it?
 
-# How to Actually Find Metadata Lock
+## How to Actually Find Metadata Lock
 
 In MySQL 5.7, there are settings in the performance_schema that you can turn on in order to see metadata locks. See [Percona's blog here](https://www.percona.com/blog/2016/12/28/quickly-troubleshooting-metadata-locks-mysql-5-7/). However this requires you to turn it on beforehand.
 
@@ -26,7 +28,7 @@ Sometimes you can tell, because you can have a long running transaction on the s
 
 Short of killing every existing connection on the server, there is actually a way to (mostly) pinpoint the exact connection that is holding the lock. We go to our trusty INNODB STATUS!
 
-## INNODB STATUS
+### INNODB STATUS
 
 1. Run `SHOW ENGINE INNODB STATUS`. It will give you an inside look into InnoDB.
 
