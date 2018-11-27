@@ -11,3 +11,5 @@
 005 - Playing with AWS Secrets Manager
 
 006 - Restore Percona Backup to AWS Aurora
+
+007 - MySQL Metadata Lock
